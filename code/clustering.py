@@ -16,7 +16,7 @@ from sklearn.decomposition import PCA as myPCA
 from sklearn.cluster import KMeans
 
 from idw import idw
-from numba import *
+
 
 
 class SpecMapClustering:

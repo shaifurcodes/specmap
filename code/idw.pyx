@@ -6,8 +6,6 @@ cimport cython
 from scipy.spatial import cKDTree as KDTree
 
 
-from numba import vectorize,float64
-
 @cython.wraparound (False)
 @cython.boundscheck(False)
 cpdef np.ndarray[np.float64_t, ndim=1] idw( np.ndarray [np.float64_t, ndim=2] X, np.ndarray [np.float64_t, ndim=1] z, np.ndarray[np.float64_t, ndim=2] q, int leafsize=16, int nnear=6, float eps=0, float p=2.0):
