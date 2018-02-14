@@ -35,9 +35,10 @@ class GenerateSpectrumMap:
         self.d_0_meter =  d_0_meter
         self.sigma_db = np.sqrt(sigma_sq_db)
 
-        self.k_dB = - 20.0 * np.log10(4.0 * np.pi * self.d_0_meter / self.lmbda_meter)
+        self.k_dB = 20.0 * np.log10(4.0 * np.pi * self.d_0_meter / self.lmbda_meter)
         self.noise_floor_dB = noise_floor_dB
         #np.random.seed(1009993)
+
     def generateIndividualMap(self):
         '''
         generates a map for each Tx
@@ -55,7 +56,7 @@ class GenerateSpectrumMap:
             x_grid, y_grid = np.meshgrid(x_vals, y_vals, sparse=False, indexing='ij')
             dist_sq_map = (  (x_grid - tx_x)**2.0 + (y_grid - tx_y)**2.0 )
 
-            path_loss = 5*self.n*np.log10( dist_sq_map/self.d_0_meter**2.0, where = dist_sq_map > 0.0)
+            path_loss =  self.k_dB  + 5.0 *self.n * np.log10( dist_sq_map/self.d_0_meter**2.0, where = dist_sq_map > 0.0)
             path_loss[dist_sq_map <= 0.0] = 0.0
             cur_map = self.tx_power_dBm[i] - path_loss
             self.ind_map.append(cur_map)
@@ -79,7 +80,7 @@ class GenerateSpectrumMap:
 
         cur_map_dB = 10*np.log10(cur_map_mW, where = cur_map_mW>0.0)
         cur_map_dB[cur_map_mW<=0.0] = self.noise_floor_dB
-        print "DEBUG: locs w NF: ",zip( cur_map_dB[cur_map_mW<=0.0] )
+        #print "DEBUG: locs w NF: ",zip( cur_map_dB[cur_map_mW<=0.0] )
 
         self.all_maps.append(cur_map_dB)
 

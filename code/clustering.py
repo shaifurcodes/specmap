@@ -5,52 +5,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import AxesGrid
 
-from scipy.spatial import cKDTree as KDTree
+
 from scipy.sparse import coo_matrix
 
 from sklearn.mixture import GaussianMixture
 from data_generator import GenerateSpectrumMap
 from sklearn.metrics.cluster import adjusted_rand_score
 from scipy.optimize import linear_sum_assignment
-from sklearn.decomposition import PCA
+from sklearn.decomposition import PCA as myPCA
 from sklearn.cluster import KMeans
 
-#...............................................................................
-class IDW:
-    def __init__( self, X, z, leafsize=16 ):
-        assert len(X) == len(z), "len(X) %d != len(z) %d" % (len(X), len(z))
-        self.tree = KDTree( X, leafsize=leafsize )  # build the tree
-        self.z = z
-        self.wn = 0
-        self.wsum = None
+from idw import idw
+from numba import *
 
-    def interpolate( self, q, nnear=6, eps=0, p=2.0, weights=None ):
-            # nnear nearest neighbours of each query point --
-        q = np.asarray(q)
-        qdim = q.ndim
-        if qdim == 1:
-            q = np.array([q])
-        if self.wsum is None:
-            self.wsum = np.zeros(nnear)
-
-        self.distances, self.ix = self.tree.query( q, k=nnear, eps=eps )
-        interpol = np.zeros( (len(self.distances),) + np.shape(self.z[0]) )
-        jinterpol = 0
-        for dist, ix in zip( self.distances, self.ix ):
-            if nnear == 1:
-                wz = self.z[ix]
-            elif dist[0] < 1e-10:
-                wz = self.z[ix[0]]
-            else:  # weight z s by 1/dist --
-                w = 1 / dist**p
-                if weights is not None:
-                    w *= weights[ix]  # >= 0
-                w /= np.sum(w)
-                wz = np.dot( w, self.z[ix] )
-            interpol[jinterpol] = wz
-            jinterpol += 1
-        return interpol if qdim > 1  else interpol[0]
-#...............................................................................
 
 class SpecMapClustering:
     '''
@@ -99,7 +66,7 @@ class SpecMapClustering:
             cur_map_max = np.max(cur_map)
             vmin = min(vmin, cur_map_min)
             vmax = max(vmax, cur_map_max)
-            print 'DEBUG:vmax, vmin: ',vmax, vmin
+            #print 'DEBUG:vmax, vmin: ',vmax, vmin
 
         for cur_map, ax in zip(map_list, grid):
             im = ax.imshow(cur_map, vmin= vmin, vmax=vmax)
@@ -166,16 +133,17 @@ class SpecMapClustering:
         :return:
         '''
         grid_x, grid_y = np.where( ~np.isnan(cur_map) )
-        grid_xy = np.array(  zip(grid_x, grid_y)  )
+        grid_xy = np.array(  zip(grid_x, grid_y), dtype=np.float64  )
         vals = cur_map[grid_x, grid_y]
 
         q_grid_x, q_grid_y = np.where( np.isnan( cur_map) )
         if len(q_grid_x) == 0:
             return  cur_map
-        q_grid_xy = np.array(  zip(q_grid_x, q_grid_y)  )
-        cur_idw = IDW(grid_xy, vals)
-        cur_map[q_grid_x, q_grid_y] = cur_idw.interpolate(   q_grid_xy, nnear= min(qnear, len(vals))   )
+        q_grid_xy = np.array(  zip(q_grid_x, q_grid_y), dtype=np.float64  )
+        #cur_idw = IDW(grid_xy, vals)
+        cur_map[q_grid_x, q_grid_y] = idw(  X=grid_xy, z=vals, q= q_grid_xy, nnear= min(qnear, len(vals))   )
         return cur_map
+
 
     def generateTrainingMatrix(self, prev_predicted_labels = None, prev_post_prob = None, cache_training_matrix = False):
         '''
@@ -209,7 +177,7 @@ class SpecMapClustering:
             else:
                 cur_training_matrix = cur_map.flatten()
         if self.pca_var_ratio < 1.0:
-            pca = PCA(self.pca_var_ratio)
+            pca = myPCA(self.pca_var_ratio)
             cur_training_matrix =  pca.fit_transform(cur_training_matrix)
         if cache_training_matrix:
             self.cached_training_matrix = np.copy( cur_training_matrix )
