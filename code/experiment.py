@@ -13,7 +13,7 @@ def createTrainingDataAndClusteringObject():
                         ,[   300, 600 ]
                       ])
     n_sample_per_config = 100
-    dim_ratio =  0.1/100.0
+    dim_ratio =  0.3/100.0
     max_x_meter = 1000.0
     max_y_meter = 1000.0
     gsm = GenerateSpectrumMap(max_x_meter = max_x_meter,
