@@ -10,11 +10,11 @@ import numpy as np
 def createTrainingDataAndClusteringObject():
     max_x = 1000.0
     max_y = 1000.0
-    tx_power_levels = [   [ 20.0,  35.0,   40.0,  50.0 ]
-                         ,[ 20.0,  35.0,   40.0,  50.0 ]
-                         ,[ 20.0,  35.0,   40.0,  50.0 ]
-                         ,[ 20.0,  35.0,   40.0,  50.0 ]
-                         ,[ 20.0,  35.0,   40.0,  50.0 ]
+    tx_power_levels = [   [ 30.0,  40.0,   50.0,  60.0 ]
+                         ,[ 30.0,  40.0,   50.0,  60.0 ]
+                         ,[ 30.0,  40.0,   50.0,  60.0 ]
+                         ,[ 30.0,  40.0,   50.0,  60.0 ]
+                         ,[ 30.0,  40.0,   50.0,  60.0 ]
                       ]
     tx_locs =  np.array([
                              [ 250.0,  250.0  ]
@@ -24,17 +24,18 @@ def createTrainingDataAndClusteringObject():
                             ,[ 750.0,  750.0  ]
                         ])
 
-    configs = ['11411', '12121', '12131', '13121', '13431']
+    configs = ['22222', '23232', '32423', '42024', '14241']
     sample_per_config = 100
     dim_ratio = 0.1
-
+    shadow_noise_dB = 20.0
     total_sample = sample_per_config*len(configs)
     gsm = GenerateSpectrumMap(max_x_meter = 1000.0,
                               max_y_meter = 1000.0,
                               tx_power_dBm = tx_power_levels,
                               tx_loc = tx_locs,
                               configs = configs,
-                              d_0_meter=10.0 )
+                              d_0_meter=10.0,
+                              sigma_sq_db = shadow_noise_dB)
 
     gsm.generateIndividualMap()
 
