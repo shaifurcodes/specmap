@@ -10,6 +10,7 @@ import numpy as np
 def createTrainingDataAndClusteringObject():
     max_x = 1000.0
     max_y = 1000.0
+    grid_size = 10.0
     tx_power_levels = [   [ 30.0,  40.0,   50.0,  60.0 ]
                          ,[ 30.0,  40.0,   50.0,  60.0 ]
                          ,[ 30.0,  40.0,   50.0,  60.0 ]
@@ -25,16 +26,18 @@ def createTrainingDataAndClusteringObject():
                         ])
 
     configs = ['22222', '23232', '32423', '42024', '14241']
+    #configs = ['44444', '44344']
     sample_per_config = 100
-    dim_ratio = 0.1
+    dim_ratio = 0.05
     shadow_noise_dB = 20.0
     total_sample = sample_per_config*len(configs)
+
     gsm = GenerateSpectrumMap(max_x_meter = 1000.0,
                               max_y_meter = 1000.0,
                               tx_power_dBm = tx_power_levels,
                               tx_loc = tx_locs,
                               configs = configs,
-                              d_0_meter=10.0,
+                              d_0_meter=grid_size,
                               sigma_sq_db = shadow_noise_dB)
 
     gsm.generateIndividualMap()
@@ -50,7 +53,12 @@ def createTrainingDataAndClusteringObject():
                             x_dim= gsm.get_map_grid_x(),
                             y_dim= gsm.get_map_grid_y()
                             )
-
+    print '\nExperiment Set Up:'
+    print "================================="
+    print '\tArea (Grids):', gsm.get_map_grid_x(), "X" , gsm.get_map_grid_y(), " Grid-size:",grid_size, "meter"
+    print "\tDim Ratio:", dim_ratio,"%", " i.e ", int( np.round(dim_ratio * gsm.get_map_grid_x() * gsm.get_map_grid_y()/100.0, 0)),"points/sample"
+    print "\tSample/Config:", sample_per_config , " #Config:", len(configs) , " #Sample:", total_sample
+    print "\t#TXs:",tx_locs.shape[0]," shadowing variance (dB):",shadow_noise_dB
     return  gsm, smc, len(configs)
 
 def runExperiment():
@@ -65,7 +73,8 @@ def runExperiment():
 
     smc.setPCAVarRatio(pca_var_ratio)
     smc.setGMMCovType(gmm_cov_type)
-
+    print "Starting experimetns..."
+    print "================================="
     # ---------------------IEM Experiment--------------------------------------------#
     iem_comp, iem_bic, iem_ari, iem_predicted_labels, iem_post_prob = smc.runGMMClustering(n_component_list=n_component_list)
     iem_derived_maps = smc.generateDerivedMaps(predicted_labels=iem_predicted_labels, pred_post_prob=iem_post_prob)
@@ -80,7 +89,8 @@ def runExperiment():
     kmeans_derived_maps = smc.generateDerivedMaps(predicted_labels=kmeans_predicted_labels)
     kmeans_map_assoc, kmeans_avg_map_error = smc.avgPairwiseMapError(gsm.spectrum_maps, kmeans_derived_maps)
     # ------------------------Summary-------------------------------------------------#
-    print "Summary:------------------"
+    print "Result Summary:"
+    print "================================="
     print "No of chosen components: ", iem_comp
     print "(KM, IEM, EMII):"
     print "ARI: ", np.round( kmeans_ari, 2), " , ", np.round( iem_ari, 2), " , " , np.round( emii_ari, 2)
@@ -109,4 +119,4 @@ if __name__ == '__main__':
         cProfile.run('runExperiment()', 'expProfile.cprof')
     else:
         runExperiment()
-    print 'Execution time:',(mytimer() - start_t)
+    print 'Execution time:', np.round( (mytimer() - start_t),3),"seconds"
