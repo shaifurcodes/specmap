@@ -25,10 +25,11 @@ def createTrainingDataAndClusteringObject():
                             ,[ 750.0,  750.0  ]
                         ])
 
-    configs = ['22222', '23232', '32423', '42024', '14241']
-    #configs = ['44444', '44344']
-    sample_per_config = 100
-    dim_ratio = 0.05
+    #configs = ['22222', '23232', '32423', '42024', '14241']
+    configs = ['33033', '33133', '33233', '33333', '33433']
+    #configs = ['43431', '43433']
+    sample_per_config = 1000
+    dim_ratio = 0.03
     shadow_noise_dB = 20.0
     total_sample = sample_per_config*len(configs)
 
@@ -57,8 +58,8 @@ def createTrainingDataAndClusteringObject():
     print "================================="
     print '\tArea (Grids):', gsm.get_map_grid_x(), "X" , gsm.get_map_grid_y(), " Grid-size:",grid_size, "meter"
     print "\tDim Ratio:", dim_ratio,"%", " i.e ", int( np.round(dim_ratio * gsm.get_map_grid_x() * gsm.get_map_grid_y()/100.0, 0)),"points/sample"
-    print "\tSample/Config:", sample_per_config , " #Config:", len(configs) , " #Sample:", total_sample
-    print "\t#TXs:",tx_locs.shape[0]," shadowing variance (dB):",shadow_noise_dB
+    print "\tSample/Config:", sample_per_config , " #-Config:", len(configs) , " total-#-Sample:", total_sample
+    print "\t#-TXs:",tx_locs.shape[0]," Noise Variance(dB):", shadow_noise_dB
     return  gsm, smc, len(configs)
 
 def runExperiment():
@@ -73,7 +74,7 @@ def runExperiment():
 
     smc.setPCAVarRatio(pca_var_ratio)
     smc.setGMMCovType(gmm_cov_type)
-    print "Starting experimetns..."
+    print "Starting experiments..."
     print "================================="
     # ---------------------IEM Experiment--------------------------------------------#
     iem_comp, iem_bic, iem_ari, iem_predicted_labels, iem_post_prob = smc.runGMMClustering(n_component_list=n_component_list)
