@@ -5,17 +5,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import AxesGrid
 
-
 from scipy.sparse import coo_matrix
-
 from sklearn.mixture import GaussianMixture
-from data_generator import GenerateSpectrumMap
 from sklearn.metrics.cluster import adjusted_rand_score
 from scipy.optimize import linear_sum_assignment
 from sklearn.decomposition import PCA as myPCA
 from sklearn.cluster import KMeans
 
-from idw import idw
+from util.idw import idw
 
 
 
@@ -48,6 +45,7 @@ class SpecMapClustering:
             self.training_data.append(cur_coo_mat)
         #-----------------------------------------------------------------------#
         self.cached_training_matrix = None
+        self.kmeans_training_matrix = None
 
     def displayMaps(self, map_list, figFilename = None, n_rows = 1):
         fig = plt.figure()
@@ -76,7 +74,6 @@ class SpecMapClustering:
             plt.savefig(figFilename)
         else:
             plt.show(block = False)
-
 
 
     def matPrint(self, a):
@@ -176,11 +173,18 @@ class SpecMapClustering:
                 cur_training_matrix  =  np.vstack( (cur_training_matrix, cur_map.flatten()) )
             else:
                 cur_training_matrix = cur_map.flatten()
+        if cache_training_matrix:
+            if self.kmeans_training_matrix is None:
+                self.kmeans_training_matrix = np.copy(cur_training_matrix)
         if self.pca_var_ratio < 1.0:
             pca = myPCA(self.pca_var_ratio)
+            print "\tRunning PCA.."
+            prev_dim = cur_training_matrix.shape[1]
             cur_training_matrix =  pca.fit_transform(cur_training_matrix)
+            print "\t\t dim reduced ",prev_dim," --> ",cur_training_matrix.shape[1]
         if cache_training_matrix:
-            self.cached_training_matrix = np.copy( cur_training_matrix )
+            if self.cached_training_matrix is None:
+                self.cached_training_matrix = np.copy( cur_training_matrix )
         return cur_training_matrix
 
     def runIIGMMClusteringForKnownComponents(self, n_components,
@@ -208,8 +212,13 @@ class SpecMapClustering:
 
         new_ari = None
         new_bic = None
+
         for i in range(max_iteration):
-            cur_training_matrix = self.generateTrainingMatrix(prev_predicted_labels = prev_predicted_labels,
+            print "DEBUG: EMII: iteration#", i
+            if i==0 and (self.cached_training_matrix is not None): #use cached training matrix, if available, for the first iteration
+                cur_training_matrix = self.cached_training_matrix
+            else:
+                cur_training_matrix = self.generateTrainingMatrix(prev_predicted_labels = prev_predicted_labels,
                                                               prev_post_prob = prev_posterior_probability)
             cur_gmm.fit(cur_training_matrix)
             new_model_score = cur_gmm.score( cur_training_matrix )
@@ -217,7 +226,7 @@ class SpecMapClustering:
             new_posterior_probability = np.amax( cur_gmm.predict_proba( cur_training_matrix), axis = 1)
             new_ari = adjusted_rand_score(self.labels, new_pred_labels)
             new_bic = cur_gmm.bic(cur_training_matrix)
-            print "DEBUG: EMII: iteration#", i, " model-score:",new_model_score, " ARI: ",new_ari
+            print "\t model-score:",new_model_score, " ARI: ",new_ari
             if i>0:
                 percent_change = 100.0*np.abs(prev_model_score - new_model_score)/prev_model_score
                 if percent_change <0.01: #<----if change less than 0.5%---
@@ -233,9 +242,9 @@ class SpecMapClustering:
         :param n_components:
         :return:
         '''
-        if self.cached_training_matrix is None:
+        if self.kmeans_training_matrix is None:
             _ = self.generateTrainingMatrix(cache_training_matrix=True)
-        self.kms_predicted_labels = KMeans(n_clusters= n_components).fit_predict(self.cached_training_matrix)
+        self.kms_predicted_labels = KMeans(n_clusters= n_components).fit_predict(self.kmeans_training_matrix)
         self.kms_ari = adjusted_rand_score( self.labels, self.kms_predicted_labels)
         return self.kms_ari, self.kms_predicted_labels
 
@@ -268,8 +277,9 @@ class SpecMapClustering:
         min_predicted_labels = None
         min_post_prob = None
         for c in n_component_list:
+            print "DEBUG: IEM: cluster# : ", c
             cur_bic, cur_ari, predicted_labels, post_prob = self.runGMMClusteringForKnownComponents(n_components =c)
-            print "DEBUG: IEM: cluster# : ",c, " BIC: ",cur_bic," ARI: ",cur_ari
+            print "\t BIC: ",cur_bic," ARI: ",cur_ari
             if cur_bic < min_bic:
                 min_comp, min_bic, min_ari, min_predicted_labels, min_post_prob = c, cur_bic, cur_ari, predicted_labels, post_prob
 
