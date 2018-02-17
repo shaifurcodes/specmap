@@ -47,7 +47,7 @@ class SpecMapClustering:
         self.cached_training_matrix = None
         self.kmeans_training_matrix = None
 
-    def displayMaps(self, map_list, figFilename = None, n_rows = 1):
+    def displayMaps(self, map_list, figFilename = None, n_rows = 1, title=''):
         fig = plt.figure()
         grid = AxesGrid(fig, 111,
                         nrows_ncols=(n_rows, int(  np.round( len(map_list)/n_rows) )),

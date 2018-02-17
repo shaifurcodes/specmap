@@ -4,6 +4,7 @@ import itertools
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import AxesGrid
+from mpl_toolkits import mplot3d
 
 class GenerateSpectrumMap:
     '''
@@ -99,18 +100,27 @@ class GenerateSpectrumMap:
 
     def displayMaps(self, map_list, figFilename, n_rows = 1):
         fig = plt.figure()
+        fig.suptitle("Maximum %-diff in input map-pairs", fontsize=16)
         nrows_ncols = (n_rows, int(  np.round( len(map_list)/n_rows) ))
         grid = AxesGrid(fig, 111,
                         nrows_ncols= nrows_ncols,
-                        axes_pad=0.01,
+                        axes_pad=0.1,
                         share_all=True,
                         label_mode="L",
                         cbar_location="right",
                         cbar_mode="single",
                         )
-
+        vmin =  float('inf')
+        vmax = -float('inf')
+        for cur_map in map_list:
+            cur_map_min = np.min(cur_map)
+            cur_map_max = np.max(cur_map)
+            vmin = min(vmin, cur_map_min)
+            vmax = max(vmax, cur_map_max)
+        if (vmax == vmin):
+            vmax += 1
         for cur_map, ax in zip(map_list, grid):
-            im = ax.imshow(cur_map, vmin=self.noise_floor_dB, vmax=0.0)
+            im = ax.imshow(cur_map, vmin=vmin, vmax=vmax)
         grid.cbar_axes[0].colorbar(im)
         #plt.show(block = False)
         plt.savefig(figFilename)
@@ -181,25 +191,74 @@ class GenerateSpectrumMap:
             cur_map[ x_indx,y_indx ] = val
         self.displayMaps([self.spectrum_maps[ self.training_data_labels[map_indx]], cur_map])
 
+    def plotMap3D(self, curMap):
+        dim_x, dim_y = curMap.shape
+        x_vals = np.arange(0.0, dim_x, 1.0)
+        y_vals = np.arange(0.0, dim_y, 1.0)
+        X, Y = np.meshgrid(x_vals, y_vals)
+
+        # Plot the surface.
+        ax = plt.axes(projection='3d')
+        ax.plot_surface(X, Y, curMap, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
+        ax.set_title('surface')
+        plt.show()
+
+    def generateDiffMaps(self):
+        '''
+
+        :return:
+        '''
+        total_maps = len(self.spectrum_maps)
+        diff_map = np.zeros_like(self.spectrum_maps[0])
+        for i in range(total_maps - 1):
+            for j in range(i+1,total_maps):
+                cur_diff_map = 100.0*np.abs(  (self.spectrum_maps[i] - self.spectrum_maps[j]) / self.spectrum_maps[i] )
+                diff_map = np.maximum(cur_diff_map, diff_map)
+                #self.displayMaps(map_list=[cur_diff_map], figFilename="./plots/diff_" + str(i) + '_vs_' + str(j) + '.png')
+        self.displayMaps(map_list=[diff_map], figFilename='./plots/diff_map.png')
+        self.plotMap3D(diff_map)
+
 if __name__ == '__main__':
     max_x = 1000.0
     max_y = 1000.0
-    tx_power_levels = [   [ 20.0, 30.0               ]
-                         ,[ 20.0, 35.0,   40.0       ]
-                         ,[ 20.0, 35.0,   40.0, 50.0 ]
+    grid_size = 10.0
+    noise_db = 10
+    tx_power_levels = [   [ 10.0, 20.0 ,30.0, 40.0, 50.0, 60.0 ]
+                         ,[ 10.0, 20,0, 30.0, 40.0, 50.0, 60.0 ]
+                         ,[ 10.0, 20.0, 30.0, 40.0, 50.0, 60.0 ]
+                         ,[ 10.0, 20.0, 30.0, 40.0, 50.0, 60.0 ]
+                         ,[ 10.0, 20.0, 30.0, 40.0, 50.0, 60.0 ]
+                         ,[ 10.0, 20.0, 30.0, 40.0, 50.0, 60.0 ]
+                        , [ 10.0, 20.0, 30.0, 40.0, 50.0, 60.0 ]
+                        , [ 10.0, 20.0, 30.0, 40.0, 50.0, 60.0 ]
+                        , [ 10.0, 20.0, 30.0, 40.0, 50.0, 60.0 ]
+                        , [ 10.0, 20.0, 30.0, 40.0, 50.0, 60.0 ]
                       ]
     tx_locs =  np.array([
-                             [ 100,  100  ]
-                            ,[750.0, 750.0]
-                            ,[500.0, 500.0]
+                             [  100.0,  250.0  ]
+                            ,[ 100.0,  750.0  ]
+                            ,[  300.0,  500.0  ]
+                            ,[ 300.0,  950.0  ]
+                            ,[ 500.0,  150.0  ]
+                            ,[ 500.0,  850.0  ]
+                            ,[ 700.0,  450.0 ]
+                            ,[ 700.0,  700.0 ]
+                            ,[ 900.0,  50.0 ]
+                            ,[ 900.0,  500.0 ]
                         ])
-    configs = ['000', '113', '111']
-    gsm = GenerateSpectrumMap(max_x_meter = 1000.0,
-                              max_y_meter = 1000.0,
+
+    #configs = ['22222', '23232', '32423', '42024', '14241']
+    configs = ['1000000001', '1000200001']
+
+    gsm = GenerateSpectrumMap(max_x_meter = max_x,
+                              max_y_meter = max_y,
                               tx_power_dBm = tx_power_levels,
                               tx_loc = tx_locs,
                               configs = configs,
+                              sigma_sq_db = noise_db,
                               d_0_meter=10.0 )
     gsm.generateIndividualMap()
     gsm.generateAllCombinationMap()
-    gsm.generateTrainingData(n_sample=1000, dim_ratio=0.4, add_noise=True)
+    gsm.generateDiffMaps()
+    #gsm.generateTrainingData(n_sample=1000, dim_ratio=0.4, add_noise=True)
+
