@@ -138,7 +138,7 @@ def runExperiment():
     # print "AER: ", np.round( kmeans_avg_map_error, 2), " , ",  np.round( iem_avg_map_error,   2)," , ",  np.round( emii_avg_map_error,  2)
     print "#-Cluster: ",n_component
     print "Kmeans ARI, AER: ", np.round( kmeans_ari, 2), " , ", np.round( kmeans_avg_map_error, 2)
-    plotDiffHeatmap3D(kmeans_derived_maps[0], kmeans_derived_maps[1])
+    #plotDiffHeatmap3D(kmeans_derived_maps[0], kmeans_derived_maps[1])
     #-------------------------------map-display---------------------------------------#
     input_maps = gsm.spectrum_maps
     # plot_filenames = ['IEM', 'EMII','KMeans']
