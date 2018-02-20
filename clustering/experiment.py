@@ -27,10 +27,10 @@ def createTrainingDataAndClusteringObject():
 
     #configs = ['22222', '23232', '32423', '42024', '14241']
     #configs = ['33033', '33133', '33233', '33333', '33433']
-    configs = ['43431', '43433']
-    sample_per_config = 1000
-    dim_ratio = 0.03
-    shadow_noise_dB = 20.0
+    configs = ['10000', '00001']
+    sample_per_config = 100
+    dim_ratio = 0.01
+    shadow_noise_dB = 500.0
     total_sample = sample_per_config*len(configs)
 
     gsm = GenerateSpectrumMap(max_x_meter = 1000.0,

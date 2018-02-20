@@ -199,6 +199,7 @@ class GenerateSpectrumMap:
 
         # Plot the surface.
         ax = plt.axes(projection='3d')
+        ax.set_zlim(0, 100)
         ax.plot_surface(X, Y, curMap, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
         ax.set_title('surface')
         plt.show()
@@ -248,7 +249,7 @@ if __name__ == '__main__':
                         ])
 
     #configs = ['22222', '23232', '32423', '42024', '14241']
-    configs = ['1000000001', '1000200001']
+    configs = ['1000000000', '0000000001']
 
     gsm = GenerateSpectrumMap(max_x_meter = max_x,
                               max_y_meter = max_y,

@@ -12,7 +12,7 @@ from scipy.optimize import linear_sum_assignment
 from sklearn.decomposition import PCA as myPCA
 from sklearn.cluster import KMeans
 
-from util.idw import idw
+from idw import  idw
 
 
 
