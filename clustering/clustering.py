@@ -168,6 +168,7 @@ class SpecMapClustering:
             indx += 1
             #print("DEBUG: processing ",indx," sample")
             cur_map = self.interpolateMissingValues(cur_map)
+            #self.plotMap3D(cur_map)
 
             if indx > 1:
                 cur_training_matrix  =  np.vstack( (cur_training_matrix, cur_map.flatten()) )
@@ -357,4 +358,32 @@ class SpecMapClustering:
 
         avg_map_error =  np.average(  error_matrix[min_err_row_indx, min_err_col_indx] )
         return zip(min_err_row_indx, min_err_col_indx) , avg_map_error
+
+    def plotMap3D(self, curMap):
+        dim_x, dim_y = curMap.shape
+        x_vals = np.arange(0.0, dim_x, 1.0)
+        y_vals = np.arange(0.0, dim_y, 1.0)
+        X, Y = np.meshgrid(x_vals, y_vals)
+
+        # Plot the surface.
+        ax = plt.axes(projection='3d')
+        ax.plot_surface(X, Y, curMap, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
+        ax.set_title('surface')
+        plt.show()
+
+    # def generateDiffMaps(self):
+    #     '''
+    #
+    #     :return:
+    #     '''
+    #     total_maps = len(self.spectrum_maps)
+    #     diff_map = np.zeros_like(self.spectrum_maps[0])
+    #     for i in range(total_maps - 1):
+    #         for j in range(i+1,total_maps):
+    #             cur_diff_map = 100.0*np.abs(  (self.spectrum_maps[i] - self.spectrum_maps[j]) / self.spectrum_maps[i] )
+    #             diff_map = np.maximum(cur_diff_map, diff_map)
+    #             #self.displayMaps(map_list=[cur_diff_map], figFilename="./plots/diff_" + str(i) + '_vs_' + str(j) + '.png')
+    #     self.displayMaps(map_list=[diff_map], figFilename='./plots/diff_map.png')
+    #     self.plotMap3D(diff_map)
+
 #----------------------------------------------------------------------------------------------------------#

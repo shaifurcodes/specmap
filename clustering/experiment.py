@@ -11,11 +11,11 @@ def createTrainingDataAndClusteringObject():
     max_x = 1000.0
     max_y = 1000.0
     grid_size = 10.0
-    tx_power_levels = [   [ 30.0,  40.0,   50.0,  60.0 ]
-                         ,[ 30.0,  40.0,   50.0,  60.0 ]
-                         ,[ 30.0,  40.0,   50.0,  60.0 ]
-                         ,[ 30.0,  40.0,   50.0,  60.0 ]
-                         ,[ 30.0,  40.0,   50.0,  60.0 ]
+    tx_power_levels = [   [ 20, 30.0,  40.0,   50.0,  60.0 ]
+                         ,[ 20, 30.0,  40.0,   50.0,  60.0 ]
+                         ,[ 20, 30.0,  40.0,   50.0,  60.0 ]
+                         ,[ 20, 30.0,  40.0,   50.0,  60.0 ]
+                         ,[ 20, 30.0,  40.0,   50.0,  60.0 ]
                       ]
     tx_locs =  np.array([
                              [ 250.0,  250.0  ]
@@ -29,8 +29,8 @@ def createTrainingDataAndClusteringObject():
     #configs = ['33033', '33133', '33233', '33333', '33433']
     configs = ['10000', '00001']
     sample_per_config = 100
-    dim_ratio = 0.01
-    shadow_noise_dB = 500.0
+    dim_ratio = 0.07/100.0
+    shadow_noise_dB = 10.0
     total_sample = sample_per_config*len(configs)
 
     gsm = GenerateSpectrumMap(max_x_meter = 1000.0,
@@ -57,7 +57,7 @@ def createTrainingDataAndClusteringObject():
     print '\nExperiment Set Up:'
     print "================================="
     print '\tArea (Grids):', gsm.get_map_grid_x(), "X" , gsm.get_map_grid_y(), " Grid-size:",grid_size, "meter"
-    print "\tDim Ratio:", dim_ratio,"%", " i.e ", int( np.round(dim_ratio * gsm.get_map_grid_x() * gsm.get_map_grid_y()/100.0, 0)),"points/sample"
+    print "\tDim Ratio:", 100*dim_ratio,"%", " i.e ", int( np.round(dim_ratio * gsm.get_map_grid_x() * gsm.get_map_grid_y()/100.0, 0)),"points/sample"
     print "\tSample/Config:", sample_per_config , " #-Config:", len(configs) , " total-#-Sample:", total_sample
     print "\t#-TXs:",tx_locs.shape[0]," Noise Variance(dB):", shadow_noise_dB
     return  gsm, smc, len(configs)
