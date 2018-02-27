@@ -166,10 +166,10 @@ class ParseSplatData(object):
 if __name__ == '__main__':
     np.random.seed(1009993)
     print "Parsing Splat Data files"
-    splatFileName = 'new_tx_2_pathloss.dat'
-    mapFileName = 'new_tx_2_pathloss'
-    ref_lat, ref_lon = 38.968118, -78.975725
-    limit_x, limit_y = 4000.0, 4000.0
+    splatFileName = 'pathloss_2.dat'
+    mapFileName = 'pathloss_2.dat'
+    ref_lat, ref_lon = 40.890308, -73.127174
+    limit_x, limit_y = 5000.0, 5000.0
 
     grid_x, grid_y = 100, 100
     pd = ParseSplatData(ref_lat, ref_lon, limit_x, limit_y, grid_x, grid_y)
