@@ -161,18 +161,16 @@ class ParseSplatData(object):
             scoords, svals = self.filterCoords(coords, vals)
             self.generateInterpolatedMap(scoords, svals, outputMapFileName, showMap=True)
 
-def runExp(fileIndx):
-    print "Parsing Splat Data files ",fileIndx
-    splatFileName = '/home/wings/splat_workspace/pathloss_'+str(fileIndx)+'.dat'
-    mapFileName = 'pathloss_'+str(fileIndx)
-    ref_lat, ref_lon = 40.901224, -73.128496
 
-    limit_x, limit_y = 5000.0, 5000.0
-    grid_x, grid_y = 100, 100
-    pd = ParseSplatData(ref_lat, ref_lon, limit_x, limit_y, grid_x, grid_y)
-    pd.generateMap(splatFileName, mapFileName)
 
 if __name__ == '__main__':
     np.random.seed(1009993)
-    runExp(1)
-    runExp(2)
+    print "Parsing Splat Data files"
+    splatFileName = 'new_tx_2_pathloss.dat'
+    mapFileName = 'new_tx_2_pathloss'
+    ref_lat, ref_lon = 38.968118, -78.975725
+    limit_x, limit_y = 4000.0, 4000.0
+
+    grid_x, grid_y = 100, 100
+    pd = ParseSplatData(ref_lat, ref_lon, limit_x, limit_y, grid_x, grid_y)
+    pd.generateMap(splatFileName, mapFileName)

@@ -5,15 +5,16 @@ import numpy as np
 
 if __name__ == '__main__':
     np.random.seed(1009993)
-    pathloss_files = ['../splat_data/pathloss_1.txt', '../splat_data/pathloss_2.txt']
+    pathloss_files = ['../splat_data/new_tx_1_pathloss.txt.txt', '../splat_data/new_tx_2_pathloss.txt.txt']
     tx_powers = [
          [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0 ]
         ,[10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0 ]
     ]
-    configs = ['60', '06', '66']
+    configs = ['06', '66', '60']
+
     dim_ratio = 0.1/100.0
     sample_per_config = 100
-    pca_var_ratio = 0.90
+    pca_var_ratio = 0.95
     gmm_cov_type = 'full'
 
     #----------------------------------------#
