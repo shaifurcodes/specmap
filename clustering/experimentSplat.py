@@ -18,8 +18,9 @@ if __name__ == '__main__':
 
     dim_ratio = 0.1/100.0
     #commiting
-    sample_per_config = 300
+    sample_per_config = 500
     pca_var_ratio = 0.9
+    
     gmm_cov_type = 'full'
 
     #----------------------------------------#
