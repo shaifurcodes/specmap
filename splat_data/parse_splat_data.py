@@ -168,8 +168,8 @@ if __name__ == '__main__':
     print "Parsing Splat Data files"
     splatFileName = 'tx_4_pathloss.dat'
     mapFileName = 'tx_4_pathloss'
-    ref_lat, ref_lon = 40.146037, -75.748596
-    limit_x, limit_y = 6000.0, 6000.0
+    ref_lat, ref_lon = 40.147811, -75.749653
+    limit_x, limit_y = 5000.0, 5000.0
 
     grid_x, grid_y = 100, 100###200, 200
     pd = ParseSplatData(ref_lat, ref_lon, limit_x, limit_y, grid_x, grid_y)
