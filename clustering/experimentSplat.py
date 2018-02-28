@@ -1,28 +1,34 @@
 from clustering import SpecMapClustering
 from input_based_data_generator import InputBasedDataGenerator
 import numpy as np
-
+import glob
+import distutils.dir_util
 
 if __name__ == '__main__':
     np.random.seed(1009993)
-    pathloss_files = ['../splat_data/pathloss_1.txt', '../splat_data/pathloss_2.txt']
-    tx_powers = [
-         [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0 ]
-        ,[10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0 ]
-    ]
+    map_directory = './maps' #the directory where all the resulting maps are saved for debugging
+    distutils.dir_util.mkpath(map_directory)
+    splat_pathloss_dir = '../splat_data/pathloss_maps'
+    tx_levels = [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0 ]
     configs = ['04', '40', '55']
-
-    dim_ratio = 0.1/100.0
+    dim_ratio = 0.2/100.0
     sample_per_config = 100
     pca_var_ratio = 0.9
     gmm_cov_type = 'full'
+
+    pathloss_files = []
+    tx_powers = []
+    for pfile in glob.glob(splat_pathloss_dir+"/*.txt"):
+        pathloss_files.append(pfile)
+        tx_powers.append(tx_levels)
 
     #----------------------------------------#
     ibdg = InputBasedDataGenerator(pathloss_files = pathloss_files,
                                    tx_powers=tx_powers,
                                    configs=configs,
                                    dim_ratio=dim_ratio,
-                                   sample_per_config=sample_per_config)
+                                   sample_per_config=sample_per_config,
+                                   mapDirectory=map_directory)
     x_indices, y_indices, vals, labels, x_grid, y_grid = ibdg.getTrainingData(saveMap=True)
     maps = ibdg.getMaps()
 
