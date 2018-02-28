@@ -16,11 +16,11 @@ if __name__ == '__main__':
     ]
     configs = ['0444', '5067', '1306','3470']
 
-    dim_ratio = 0.1/100.0
+    dim_ratio = 0.2/100.0
     #commiting
     sample_per_config = 500
     pca_var_ratio = 0.9
-    
+
     gmm_cov_type = 'full'
 
     #----------------------------------------#
