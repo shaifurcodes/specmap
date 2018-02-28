@@ -9,7 +9,7 @@ class InputBasedDataGenerator(object):
     3. generate maps for each config
     4. generate training matrix for given %-dim and sample_count
     '''
-    def __init__(self, pathloss_files, tx_powers, configs, dim_ratio, sample_per_config):
+    def __init__(self, pathloss_files, tx_powers, configs, dim_ratio, sample_per_config, mapDirectory = '.'):
         '''
 
         :param pathloss_files:
@@ -35,6 +35,8 @@ class InputBasedDataGenerator(object):
         self.training_data_y_indx = []
         self.training_data_labels = [] #index to self.all_maps
 
+        self.mapDirectory = mapDirectory
+
     def loadPathlossMaps(self):
         '''
         :return:
@@ -53,7 +55,7 @@ class InputBasedDataGenerator(object):
         yi = np.arange(0, self.grid_y, 1.0)
         CS = plt.contourf(xi, yi, cur_map, 10, cmap='viridis')
         plt.colorbar()
-        plt.savefig(title + ".png")
+        plt.savefig(self.mapDirectory+"/"+title + ".png")
         plt.close()
 
     def saveSampleMap(self, cur_map, title):
@@ -67,7 +69,7 @@ class InputBasedDataGenerator(object):
         x, y = np.meshgrid(xr, yr)
         plt.scatter(x, y, s=1.0, marker= "D", c=cur_map)
         plt.colorbar()
-        plt.savefig(title+'.png')
+        plt.savefig(self.mapDirectory+"/"+title+'.png')
         plt.close()
 
     def generateMapPerConfig(self, saveMap = False):
@@ -89,7 +91,7 @@ class InputBasedDataGenerator(object):
             if saveMap:
                 self.saveMap(output_map_dB, cur_config)
 
-    def generateTrainingData(self, saveMapFig = False):
+    def generateTrainingData(self, saveMapFig = False, mapDirectory = '.'):
         '''
         :return:
         '''
@@ -125,7 +127,7 @@ class InputBasedDataGenerator(object):
             self.training_data_y_indx.append(y_indx)
         if saveMapFig:
             for idx, config in enumerate(self.configs):
-                self.saveSampleMap( self.debug_training_maps[idx] ,"sample_"+config)
+                self.saveSampleMap( self.debug_training_maps[idx] , "sample_"+config)
 
     def getMaps(self):
         '''
