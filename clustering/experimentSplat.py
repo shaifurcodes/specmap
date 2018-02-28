@@ -16,7 +16,7 @@ if __name__ == '__main__':
     ]
     configs = ['0444', '5067', '1306','3470']
 
-    dim_ratio = 0.05/100.0
+    dim_ratio = 0.5/100.0
     #commiting0.3
     sample_per_config = 500
     pca_var_ratio = 0.9
