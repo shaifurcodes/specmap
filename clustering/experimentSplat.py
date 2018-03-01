@@ -6,19 +6,19 @@ import numpy as np
 if __name__ == '__main__':
     np.random.seed(1009993)
     pathloss_files = ['../splat_data/tx_1_pathloss.txt', '../splat_data/tx_2_pathloss.txt', '../splat_data/tx_3_pathloss.txt',
-                      '../splat_data/tx_4_pathloss.txt']
+                      '../splat_data/tx_4_pathloss.txt']#, '../splat_data/tx_5_pathloss.txt']
     tx_powers = [
          [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0 ]
         ,[10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0 ]
         ,[10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0 ]
         ,[10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0 ]
+        #,[10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0 ]
 
     ]
-    configs = ['0444', '5067', '1306','3470']
-
-    dim_ratio = 0.8/100.0
+    configs = ['0444', '5067', '1306', '3470', '3456', '5555']
+    dim_ratio = 0.8/100#0.5/100.0
     #commiting0.3
-    sample_per_config = 500
+    sample_per_config = 100
     pca_var_ratio = 0.9
 
     gmm_cov_type = 'full'
