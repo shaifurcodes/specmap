@@ -213,6 +213,8 @@ class SpecMapClustering:
 
         new_ari = None
         new_bic = None
+        best_bic, best_ari, best_pred_labels, best_posterior_probability = None, None, None, None
+        best_model_score = -float('inf')
 
         for i in range(max_iteration):
             print "DEBUG: EMII: iteration#", i
@@ -228,6 +230,8 @@ class SpecMapClustering:
             new_ari = adjusted_rand_score(self.labels, new_pred_labels)
             new_bic = cur_gmm.bic(cur_training_matrix)
             print "\t model-score:",new_model_score, " ARI: ",new_ari
+            if new_model_score > best_model_score:
+                best_bic, best_ari, best_pred_labels, best_posterior_probability = new_bic, new_ari, new_pred_labels, new_posterior_probability
             if i>0:
                 percent_change = 100.0*np.abs(prev_model_score - new_model_score)/prev_model_score
                 if percent_change <0.01: #<----if change less than 0.5%---
@@ -235,7 +239,7 @@ class SpecMapClustering:
             prev_model_score = new_model_score
             prev_predicted_labels = new_pred_labels
             prev_posterior_probability = new_posterior_probability
-        return new_bic, new_ari, new_pred_labels, new_posterior_probability
+        return best_bic, best_ari, best_pred_labels, best_posterior_probability
 
     def runKMeansClusteringForKnownComponents(self, n_components):
         '''
@@ -308,7 +312,7 @@ class SpecMapClustering:
         mapA_mW = np.power(10.0, mapA_dBm / 10.0)
         mapB_mW = np.power(10.0, mapB_dBm / 10.0)
 
-        mapA_mW[mapA_dBm == 0.0] = 0.000001 #to avoid div-by-zero
+        mapA_mW[mapA_mW == 0.0] = 0.000001 #to avoid div-by-zero
 
         error_A_B = (np.abs(mapA_mW - mapB_mW)) / mapA_mW
         avg_error = np.average(error_A_B)

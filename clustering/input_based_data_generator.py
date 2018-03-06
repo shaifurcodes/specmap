@@ -28,7 +28,7 @@ class InputBasedDataGenerator(object):
         self.grid_x = self.grid_y = -1
         self.single_tx_pathloss = []
         self.maps = []
-        self.noise_floor_dBm = -100.0
+        self.noise_floor_dBm = -400.0
 
         self.training_data_vals = []
         self.training_data_x_indx = []
@@ -41,7 +41,7 @@ class InputBasedDataGenerator(object):
         '''
         :return:
         '''
-        for fname in self.pathloss_files:
+        for fname in sorted(self.pathloss_files):
             with open(fname, 'r') as f:
                 self.single_tx_pathloss.append( np.loadtxt(fname, dtype=np.float) )
         self.grid_x, self.grid_y = self.single_tx_pathloss[0].shape
@@ -161,7 +161,7 @@ if __name__ == '__main__':
                                    configs=configs,
                                    dim_ratio=dim_ratio,
                                    sample_per_config=sample_per_config)
-    _, _, _, _ , _, _ = ibdg.getTrainingData(saveMap=True)
+    _, _, _, _ , _, _ = ibdg.getTrainingData(saveMap=False)
     # ibdg.loadPathlossMaps()
     # ibdg.generateMapPerConfig(saveMap=True)
     # print "generateing training data.."

@@ -183,20 +183,21 @@ def generatePathlossMaps():
 
 #------------global parameters-------------------------#
 #check __init__ documentation (beginning of this file) for descirption of the folloiwng params
-tx_config_file = 'tx_config.txt'
-generic_lrp_file = 'generic_tx.lrp'
-splat_exp_dir = './splat_experiment/' #change this directory for new experiment, else will be overwritten
+tx_config_file = './tx_configs/tx_5_config.txt'
+generic_lrp_file = './tx_configs/generic_tx.lrp'
+splat_exp_dir = './splat_temp/' #change this directory for new experiment, else will be overwritten
 terrain_dir = './terrain_files/'
-tx_range_km = 20.0
+tx_range_km = 25.0
 srtm2sdf_util_path = ''
 splat_bin_path = ''
 recv_antenna_height_meter = 20.0
-pathlossMapOutputDirectory = './pathloss_maps'
-ref_lat, ref_lon = 40.890308, -73.127174
+pathlossMapOutputDirectory = './pathloss_maps_tx_5'
+ref_lat, ref_lon = 40.896813, -73.065204
 limit_x, limit_y = 5000.0, 5000.0
 grid_x, grid_y = 100, 100
 #------------------------------------------------------#
 if __name__ == '__main__':
+    np.random.seed(1009993)
     runSplatExp()
     generatePathlossMaps()
 
