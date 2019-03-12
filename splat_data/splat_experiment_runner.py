@@ -192,7 +192,7 @@ srtm2sdf_util_path = ''
 splat_bin_path = ''
 recv_antenna_height_meter = 20.0
 pathlossMapOutputDirectory = './pathloss_maps_tx_flat'
-ref_lat, ref_lon = 31.093328, -57.687580 #39.177643, -78.266090
+ref_lat, ref_lon = 39.177643, -78.266090
 limit_x, limit_y = 5000.0, 5000.0
 grid_x, grid_y = 100, 100
 #------------------------------------------------------#
