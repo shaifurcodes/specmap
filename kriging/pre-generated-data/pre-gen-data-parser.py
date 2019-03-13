@@ -4,6 +4,8 @@ from timeit import default_timer as mytimer
 from guppy import hpy
 from functools import reduce
 
+from scipy import spatial
+
 import matplotlib.pyplot as plt
 
 class SUAllocation(object):
@@ -26,6 +28,12 @@ class SUAllocation(object):
         self.PR = None
         self.loss_PU_SS = None
         self.loss_PR_SU = None
+
+        self.nearest_SS = 5
+
+        #---internal datastructure---#
+        self.kdtPU = None
+        self.kdtSS = None
 
     def allocateArrays(self):
         '''
@@ -276,7 +284,42 @@ class SUAllocation(object):
         allocate power to suID so that
         :param suID:
         :return:
+        tasks:
+            1) find the nearest PU+its-PR's and nearest k SS's along with distances SU-PU, SU-PR, SU-SS
+            2) 'interpolate' pathloss PU->SU from those those at PU->SS
+            3) for each PR, 'extrapolate' pathloss SU->PR from PU->PR
         '''
+        #------step 1----#
+        #----find nearest PU and K SS's----#
+        if self.kdtPU is None:
+            self.kdtPU = spatial.KDTree(self.PU[:,0:3])
+        if self.kdtSS is None:
+            self.kdtSS = spatial.KDTree(self.SS)
+
+        kpu = self.kdtPU.query( self.SU[suID], k = 1 )
+        kss = self.kdtSS.query( self.SU[suID], k= self.nearest_SS)
+
+        # print "current SU loc: ", self.SU[suID]
+        # print "nearest PU loc: ", self.PU[ kpu[1] ]
+        # print "nearest SS locs:"
+        # for i in kss[1]:
+        #     print self.SS[i]
+
+        #----debug-plot-----#
+        # plt.scatter( self.PU[:, 0], self.PU[:, 1], marker = 's', s=30, c='b' )
+        # plt.scatter( self.SS[:, 0], self.SS[:, 1], marker = 'o', s=10,  c='r' )
+        # plt.scatter( self.SU[:, 0], self.SU[:, 1], marker = '^', s=30, c='g' )
+        #
+        # plt.scatter(self.PU[ kpu[1], 0], self.PU[ kpu[1] ,  1], marker='H', s=70, c='b')
+        # plt.scatter(self.SS[ kss[1], 0], self.SS[ kss[1] , 1], marker='o', s=70, c='r')
+        # plt.scatter(self.SU[ suID, 0],   self.SU[suID, 1], marker='^', s=70, c='g')
+        # #---ALSO THE PR's of this PU
+        # plt.scatter(self.PU[kpu[1], 0], self.PU[kpu[1], 1], marker='*', s=70, c='')
+        # plt.show()
+
+
+        #----step 2------#
+        #<--complete step 2 and 3
         return
 
 def runExperiment():
@@ -293,7 +336,8 @@ def runExperiment():
     ifname =  'data_small.txt'
     sua.parsePreGeneratedPathlossData(ifname=ifname)
     #sua.extractSmallerScenario(max_x= 8500., max_y = 8500., min_x = 7500., min_y =  7500.)
-    sua.plotLocations()
+    #sua.plotLocations()
+    sua.processSURequest(suID=6)
 
     if check_memory:
         import pdb
